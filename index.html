@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encomiendas Tempisque • Envíos Rápidos y Seguros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Poppins:wght@500;600&amp;display=swap');
+        
+        :root {
+            --primary: #1565c0;
+            --accent: #f97316;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .heading-font {
+            font-family: 'Poppins', system-ui, sans-serif;
+        }
+
+        .nav-scrolled {
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+        }
+
+        .modern-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .modern-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .section-header {
+            font-size: 2.25rem;
+            line-height: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .feature-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .modern-card:hover .feature-icon {
+            transform: scale(1.1);
+        }
+
+        .nav-link {
+            transition: color 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            color: #1565c0;
+        }
+
+        .tracking-result {
+            animation: fadeInUp 0.4s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-bg {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+        }
+
+        .service-badge {
+            background: linear-gradient(to right, #1d4ed8, #1e3a8a);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <!-- Navbar -->
+    <nav id="navbar" class="bg-white border-b border-slate-200 sticky top-0 z-50 transition-all">
+        <div class="max-w-screen-xl mx-auto">
+            <div class="px-6 py-5 flex items-center justify-between">
+                <div class="flex items-center gap-x-3">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-x-3">
+                        <div class="w-11 h-11 bg-blue-700 rounded-2xl flex items-center justify-center">
+                            <i class="fa-solid fa-truck text-white text-3xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-3xl tracking-tighter heading-font">Tempisque</span>
+                            <span class="text-blue-700 font-semibold text-xl">Encomiendas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center gap-x-9 text-sm font-medium">
+                    <a href="#servicios" class="nav-link text-slate-600 hover:text-blue-700">Servicios</a>
+                    <a href="#destinos" class="nav-link text-slate-600 hover:text-blue-700">Destinos</a>
+                    <a href="#como-enviar" class="nav-link text-slate-600 hover:text-blue-700">Cómo Enviar</a>
+                    <a href="#rastrear" class="nav-link text-slate-600 hover:text-blue-700">Rastrear</a>
+                </div>
+
+                <div class="flex items-center gap-x-3">
+                    <a href="#contacto" 
+                       class="hidden md:block px-5 py-2.5 text-sm font-semibold text-white bg-blue-700 hover:bg-blue-800 transition-colors rounded-3xl">
+                        Contactar
+                    </a>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn"
+                            class="md:hidden w-10 h-10 flex items-center justify-center text-slate-600 hover:text-blue-700">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t bg-white">
+            <div class="px-6 py-4 flex flex-col gap-y-1 text-sm">
+                <a href="#servicios" class="mobile-link px-4 py-3 hover:bg-slate-100 rounded-2xl">Servicios</a>
+                <a href="#destinos" class="mobile-link px-4 py-3 hover:bg-slate-100 rounded-2xl">Destinos</a>
+                <a href="#como-enviar" class="mobile-link px-4 py-3 hover:bg-slate-100 rounded-2xl">Cómo Enviar</a>
+                <a href="#rastrear" class="mobile-link px-4 py-3 hover:bg-slate-100 rounded-2xl">Rastrear</a>
+                <a href="#contacto" class="mobile-link px-4 py-3 hover:bg-slate-100 rounded-2xl">Contacto</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-bg text-white">
+        <div class="max-w-screen-xl mx-auto px-6 pt-16 pb-20 md:pt-20 md:pb-24">
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div>
+                    <div class="inline-flex items-center gap-x-2 px-4 h-9 rounded-3xl bg-white/10 backdrop-blur-md mb-6">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                        <span class="text-sm font-medium">Servicio #1 en Costa Rica</span>
+                    </div>
+
+                    <h1 class="text-6xl md:text-7xl font-bold tracking-tighter heading-font leading-none mb-5">
+                        Envíos rápidos<br>
+                        y seguros.
+                    </h1>
+
+                    <p class="max-w-md text-xl text-white/90 mb-9">
+                        Conectamos San José, Guanacaste y Puntarenas con la mayor eficiencia y confianza del país.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <a href="#rastrear"
+                           class="inline-flex items-center justify-center gap-x-3 px-8 h-14 bg-orange-500 hover:bg-orange-600 text-white font-semibold text-lg rounded-3xl transition-all active:scale-[0.985]">
+                            <i class="fa-solid fa-search"></i>
+                            <span>Rastrear paquete</span>
+                        </a>
+
+                        <a href="#contacto"
+                           class="inline-flex items-center justify-center gap-x-3 px-8 h-14 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-semibold rounded-3xl transition-all">
+                            <span>Contactar ahora</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex justify-end">
+                    <img src="item01.jpg"
+                         alt="Encomienda fácil, rápida y segura — Encomiendas Tempisque"
+                         class="w-full max-w-sm rounded-3xl shadow-2xl object-cover">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trust Bar -->
+    <div class="border-b bg-white">
+        <div class="max-w-screen-xl mx-auto px-6 py-5">
+            <div class="flex flex-wrap justify-center md:justify-between items-center gap-x-8 gap-y-4 text-sm">
+                <div class="flex items-center gap-x-2 text-slate-600">
+                    <i class="fa-solid fa-shield-halved text-blue-700"></i>
+                    <span class="font-medium">+15 años de experiencia</span>
+                </div>
+                <div class="flex items-center gap-x-2 text-slate-600">
+                    <i class="fa-solid fa-truck text-blue-700"></i>
+                    <span class="font-medium">Entregas el mismo día</span>
+                </div>
+                <div class="flex items-center gap-x-2 text-slate-600">
+                    <i class="fa-solid fa-users text-blue-700"></i>
+                    <span class="font-medium">Miles de clientes satisfechos</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div id="servicios" class="max-w-screen-xl mx-auto px-6 py-20">
+        <div class="text-center mb-12">
+            <span class="px-4 py-1.5 text-xs font-semibold tracking-widest text-blue-700 bg-blue-100 rounded-3xl">NUESTROS SERVICIOS</span>
+            <h2 class="section-header text-slate-900 mt-4">¿Por qué elegir Encomiendas Tempisque?</h2>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-5">
+            <!-- Feature Cards -->
+            <div class="modern-card bg-white border border-slate-200 p-6 rounded-3xl">
+                <div class="feature-icon w-12 h-12 flex items-center justify-center bg-blue-100 text-blue-700 rounded-2xl mb-5">
+                    <i class="fa-solid fa-bolt text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-2">Rapidez en la entrega</h3>
+                <p class="text-slate-600">Los envíos viajan en las mismas unidades de pasajeros, garantizando tiempos de entrega cortos.</p>
+            </div>
+            
+            <div class="modern-card bg-white border border-slate-200 p-6 rounded-3xl">
+                <div class="feature-icon w-12 h-12 flex items-center justify-center bg-blue-100 text-blue-700 rounded-2xl mb-5">
+                    <i class="fa-solid fa-map-marked text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-2">Cobertura regional</h3>
+                <p class="text-slate-600">Conectamos distintas zonas del país, facilitando envíos entre regiones.</p>
+            </div>
+            
+            <div class="modern-card bg-white border border-slate-200 p-6 rounded-3xl">
+                <div class="feature-icon w-12 h-12 flex items-center justify-center bg-blue-100 text-blue-700 rounded-2xl mb-5">
+                    <i class="fa-solid fa-shield-halved text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-2">Seguridad y cuidado</h3>
+                <p class="text-slate-600">Manejo de carga con protocolos que reducen riesgos de pérdida o daño.</p>
+            </div>
+            
+            <div class="modern-card bg-white border border-slate-200 p-6 rounded-3xl">
+                <div class="feature-icon w-12 h-12 flex items-center justify-center bg-blue-100 text-blue-700 rounded-2xl mb-5">
+                    <i class="fa-solid fa-boxes text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-2">Flexibilidad total</h3>
+                <p class="text-slate-600">Enviamos paquetes de diferentes tamaños: desde sobres hasta bultos grandes.</p>
+            </div>
+            
+            <div class="modern-card bg-white border border-slate-200 p-6 rounded-3xl">
+                <div class="feature-icon w-12 h-12 flex items-center justify-center bg-blue-100 text-blue-700 rounded-2xl mb-5">
+                    <i class="fa-solid fa-tags text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-2">Tarifas accesibles</h3>
+                <p class="text-slate-600">Precios competitivos ajustados al peso y tamaño del envío.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Destinations -->
+    <div id="destinos" class="bg-white border-y">
+        <div class="max-w-screen-xl mx-auto px-6 py-20">
+            <div class="grid md:grid-cols-12 gap-x-12 items-center">
+                <div class="md:col-span-5 mb-12 md:mb-0">
+                    <span class="px-4 py-1.5 text-xs font-semibold tracking-widest text-blue-700 bg-blue-100 rounded-3xl">COBERTURA</span>
+                    <h2 class="section-header text-slate-900 mt-4 mb-4">Destinos y cobertura</h2>
+                    <p class="text-lg text-slate-600">Nuestras rutas conectan los puntos clave de Costa Rica con total confiabilidad.</p>
+                    <div class="mt-8">
+                        <img src="item02.jpg"
+                             alt="Flota de camiones de Encomiendas Tempisque en operación"
+                             class="w-full rounded-3xl object-cover shadow-md">
+                    </div>
+                </div>
+                
+                <div class="md:col-span-7">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="flex items-center gap-x-4 bg-slate-50 border px-6 py-5 rounded-3xl">
+                            <i class="fa-solid fa-city text-3xl text-blue-700 w-9"></i>
+                            <div>
+                                <div class="font-semibold">San José</div>
+                                <div class="text-sm text-slate-500">Capital y alrededores</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-x-4 bg-slate-50 border px-6 py-5 rounded-3xl">
+                            <i class="fa-solid fa-globe text-3xl text-blue-700 w-9"></i>
+                            <div>
+                                <div class="font-semibold">Guanacaste</div>
+                                <div class="text-sm text-slate-500">Liberia, Santa Cruz y más</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-x-4 bg-slate-50 border px-6 py-5 rounded-3xl">
+                            <i class="fa-solid fa-water text-3xl text-blue-700 w-9"></i>
+                            <div>
+                                <div class="font-semibold">Puntarenas</div>
+                                <div class="text-sm text-slate-500">Costa y ciudades intermedias</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-x-4 bg-slate-50 border px-6 py-5 rounded-3xl">
+                            <i class="fa-solid fa-road text-3xl text-blue-700 w-9"></i>
+                            <div>
+                                <div class="font-semibold">Ciudades intermedias</div>
+                                <div class="text-sm text-slate-500">Todo el trayecto</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How it works -->
+    <div id="como-enviar" class="max-w-screen-xl mx-auto px-6 py-20">
+        <div class="text-center mb-12">
+            <span class="px-4 py-1.5 text-xs font-semibold tracking-widest text-blue-700 bg-blue-100 rounded-3xl">PROCESO SIMPLE</span>
+            <h2 class="section-header mt-4">Cómo enviar una encomienda</h2>
+        </div>
+        
+        <div class="max-w-4xl mx-auto">
+            <div class="space-y-4">
+                <div class="flex gap-x-6 items-start p-6 bg-white border border-slate-200 rounded-3xl">
+                    <div class="flex-shrink-0 w-9 h-9 flex items-center justify-center bg-blue-700 text-white font-bold rounded-full">1</div>
+                    <div>
+                        <div class="font-semibold text-lg">Acércate a la terminal o agencia</div>
+                        <p class="text-slate-600">Visita la terminal más cercana de Autotransportes Tempisque.</p>
+                    </div>
+                </div>
+                <div class="flex gap-x-6 items-start p-6 bg-white border border-slate-200 rounded-3xl">
+                    <div class="flex-shrink-0 w-9 h-9 flex items-center justify-center bg-blue-700 text-white font-bold rounded-full">2</div>
+                    <div>
+                        <div class="font-semibold text-lg">Presenta el paquete</div>
+                        <p class="text-slate-600">Lleva tu paquete debidamente empacado y rotulado.</p>
+                    </div>
+                </div>
+                <div class="flex gap-x-6 items-start p-6 bg-white border border-slate-200 rounded-3xl">
+                    <div class="flex-shrink-0 w-9 h-9 flex items-center justify-center bg-blue-700 text-white font-bold rounded-full">3</div>
+                    <div>
+                        <div class="font-semibold text-lg">Indica los datos del destinatario</div>
+                        <p class="text-slate-600">Nombre completo, número de contacto y destino.</p>
+                    </div>
+                </div>
+                <div class="flex gap-x-6 items-start p-6 bg-white border border-slate-200 rounded-3xl">
+                    <div class="flex-shrink-0 w-9 h-9 flex items-center justify-center bg-blue-700 text-white font-bold rounded-full">4</div>
+                    <div>
+                        <div class="font-semibold text-lg">Paga y recibe tu comprobante</div>
+                        <p class="text-slate-600">Cancela según peso y tamaño. Recibe el comprobante para retiro.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tracking Section -->
+    <div id="rastrear" class="bg-slate-900 text-white py-20">
+        <div class="max-w-screen-xl mx-auto px-6">
+            <div class="max-w-xl mx-auto text-center">
+                <span class="px-4 py-1.5 text-xs font-semibold tracking-widest bg-white/10 text-white rounded-3xl">EN TIEMPO REAL</span>
+                <h2 class="section-header mt-4 mb-3">Rastrea tu paquete</h2>
+                <p class="text-lg text-white/70">Ingresa tu número de guía para conocer el estado de tu envío.</p>
+            </div>
+            
+            <div class="max-w-md mx-auto mt-10">
+                <div class="bg-white/5 border border-white/10 p-2 rounded-3xl">
+                    <div class="flex bg-white rounded-[22px]">
+                        <input id="tracking-input" 
+                               type="text" 
+                               placeholder="Ej: TMP-2025-78432"
+                               class="flex-1 px-6 py-4 text-slate-800 placeholder:text-slate-400 bg-transparent outline-none text-lg">
+                        <button onclick="trackPackage()"
+                                class="px-9 font-semibold bg-orange-500 hover:bg-orange-600 transition-colors text-white rounded-[22px]">
+                            Rastrear
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Tracking Result -->
+                <div id="tracking-result" class="hidden mt-6 bg-white/5 border border-white/10 p-6 rounded-3xl tracking-result">
+                    <div class="flex items-center justify-between mb-5">
+                        <div>
+                            <div class="text-xs text-white/60">NÚMERO DE GUÍA</div>
+                            <div id="tracking-number" class="font-mono font-semibold text-xl"></div>
+                        </div>
+                        <div class="px-4 py-1 text-sm font-medium bg-emerald-500 text-emerald-900 rounded-3xl">En tránsito</div>
+                    </div>
+                    
+                    <div class="space-y-4 text-sm">
+                        <div class="flex justify-between items-center">
+                            <div>Origen</div>
+                            <div class="font-medium">San José</div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div>Destino</div>
+                            <div class="font-medium">Liberia, Guanacaste</div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div>Estado actual</div>
+                            <div class="font-medium text-emerald-400">En ruta • Estimado: hoy</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-6 border-t border-white/10 flex justify-center">
+                        <button onclick="resetTracking()" 
+                                class="text-sm flex items-center gap-x-2 px-4 py-2 text-white/70 hover:text-white">
+                            <i class="fa-solid fa-redo"></i>
+                            <span>Realizar otra consulta</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact -->
+    <div id="contacto" class="max-w-screen-xl mx-auto px-6 py-20">
+        <div class="grid md:grid-cols-2 gap-x-16 gap-y-10 items-center">
+            <div>
+                <span class="px-4 py-1.5 text-xs font-semibold tracking-widest text-blue-700 bg-blue-100 rounded-3xl">CONTÁCTANOS</span>
+                <h2 class="section-header mt-4 mb-3">¿Necesitas ayuda?</h2>
+                <p class="text-xl text-slate-600">Nuestro equipo está listo para atenderte.</p>
+                
+                <div class="mt-8 space-y-4">
+                    <div class="flex items-center gap-x-4">
+                        <div class="w-10 h-10 bg-blue-100 text-blue-700 flex items-center justify-center rounded-2xl">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm text-slate-500">WhatsApp</div>
+                            <a href="#" class="font-semibold hover:text-blue-700">+506 8888-1234</a>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-x-4">
+                        <div class="w-10 h-10 bg-blue-100 text-blue-700 flex items-center justify-center rounded-2xl">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm text-slate-500">Teléfono</div>
+                            <a href="#" class="font-semibold hover:text-blue-700">+506 2222-5555</a>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-x-4">
+                        <div class="w-10 h-10 bg-blue-100 text-blue-700 flex items-center justify-center rounded-2xl">
+                            <i class="fa-solid fa-envelope"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm text-slate-500">Email</div>
+                            <a href="mailto:tempisquesj@gmail.com" class="font-semibold hover:text-blue-700">tempisquesj@gmail.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white border border-slate-200 p-8 rounded-3xl">
+                <div class="font-semibold mb-5">Envíanos un mensaje</div>
+                <form class="space-y-4" onsubmit="submitContactForm(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" placeholder="Nombre" class="border border-slate-300 px-4 py-3 rounded-2xl w-full focus:outline-none focus:border-blue-600" required>
+                        <input type="tel" placeholder="Teléfono" class="border border-slate-300 px-4 py-3 rounded-2xl w-full focus:outline-none focus:border-blue-600" required>
+                    </div>
+                    <input type="email" placeholder="Correo electrónico" class="border border-slate-300 px-4 py-3 rounded-2xl w-full focus:outline-none focus:border-blue-600" required>
+                    <textarea placeholder="Mensaje o consulta" rows="3" class="border border-slate-300 px-4 py-3 rounded-2xl w-full resize-y min-h-[100px] focus:outline-none focus:border-blue-600" required></textarea>
+                    <button type="submit" class="w-full py-3.5 font-semibold bg-orange-500 text-white rounded-3xl hover:bg-orange-600 transition-colors">
+                        Enviar mensaje
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white/70">
+        <div class="max-w-screen-xl mx-auto px-6 py-12 text-sm">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-y-4">
+                <div>© 2026 Encomiendas Tempisque. Todos los derechos reservados.</div>
+                <div class="flex gap-x-6">
+                    <a href="#" class="hover:text-white transition-colors">Política de privacidad</a>
+                    <a href="#" class="hover:text-white transition-colors">Términos de servicio</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/50688881234"
+       target="_blank"
+       rel="noopener noreferrer"
+       aria-label="Contactar por WhatsApp"
+       class="fixed bottom-6 right-6 z-50 flex items-center gap-x-2.5 px-5 py-3.5 rounded-full shadow-xl transition-all hover:scale-105 active:scale-95"
+       style="background-color:#25D366;">
+        <i class="fa-brands fa-whatsapp text-white text-2xl"></i>
+        <span class="hidden sm:inline text-white font-semibold text-sm">WhatsApp</span>
+    </a>
+
+    <script>
+        // Tailwind script
+        function initializeTailwind() {
+            document.documentElement.style.setProperty('--accent', '#1565c0');
+        }
+
+        // Navbar scroll effect
+        function initNavbar() {
+            const navbar = document.getElementById('navbar');
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    navbar.classList.add('nav-scrolled', 'bg-white/95', 'backdrop-blur-lg');
+                } else {
+                    navbar.classList.remove('nav-scrolled', 'bg-white/95', 'backdrop-blur-lg');
+                }
+            });
+
+            // Mobile menu
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                const icon = mobileBtn.querySelector('i');
+                if (mobileMenu.classList.contains('hidden')) {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                } else {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                }
+            });
+
+            // Close mobile menu on link click
+            document.querySelectorAll('.mobile-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    mobileBtn.querySelector('i').classList.remove('fa-times');
+                    mobileBtn.querySelector('i').classList.add('fa-bars');
+                });
+            });
+        }
+
+        // Escape user-controlled strings before injecting into innerHTML
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str == null ? '' : String(str);
+            return div.innerHTML;
+        }
+
+        // ==================== SUPABASE CONFIG ====================
+        const SUPABASE_URL = 'https://nhcnztnszsdtzyfannev.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oY256dG5zenNkdHp5ZmFubmV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4NTI4NjAsImV4cCI6MjA5NjQyODg2MH0._WluQjIFQILasS7Pw35XSCgYBlVVn1_suP51o12GWIg';
+
+        let supabaseClient = null;
+
+        function initSupabase() {
+            if (SUPABASE_URL.includes('YOUR-PROJECT-ID')) {
+                console.warn('%c[Supabase] Please replace SUPABASE_URL and SUPABASE_ANON_KEY with your real credentials.', 'color: #f59e0b');
+                return null;
+            }
+            return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
+        // ==================== REAL TRACKING FUNCTION ====================
+        async function trackPackage() {
+            const input = document.getElementById('tracking-input');
+            const result = document.getElementById('tracking-result');
+            const numberEl = document.getElementById('tracking-number');
+
+            const trackingNumber = input.value.trim();
+
+            if (!trackingNumber) {
+                input.classList.add('!border-red-400');
+                setTimeout(() => input.classList.remove('!border-red-400'), 1500);
+                return;
+            }
+
+            // Show loading state
+            numberEl.textContent = trackingNumber;
+            result.classList.remove('hidden');
+            result.style.display = 'block';
+            result.innerHTML = `
+                <div class="flex items-center justify-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                    <span class="ml-3 text-white/80">Buscando paquete...</span>
+                </div>
+            `;
+
+            try {
+                // Initialize Supabase if not already done
+                if (!supabaseClient) {
+                    supabaseClient = initSupabase();
+                }
+
+                if (!supabaseClient) {
+                    // Fallback to demo mode if credentials not set
+                    showDemoResult(trackingNumber, result, numberEl);
+                    return;
+                }
+
+                // Query Supabase
+                const { data, error } = await supabaseClient
+                    .from('packages')
+                    .select('*')
+                    .eq('tracking_number', trackingNumber)
+                    .single();
+
+                if (error || !data) {
+                    result.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="fa-solid fa-exclamation-triangle text-amber-400 text-3xl mb-3"></i>
+                            <div class="font-semibold">Paquete no encontrado</div>
+                            <p class="text-sm text-white/60 mt-1">Verifica el número de guía e intenta de nuevo.</p>
+                            <button onclick="resetTracking()" class="mt-4 text-sm px-4 py-2 bg-white/10 rounded-2xl hover:bg-white/20">Intentar de nuevo</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Show real data
+                showRealResult(data, result, numberEl);
+
+            } catch (err) {
+                console.error(err);
+                showDemoResult(trackingNumber, result, numberEl);
+            }
+        }
+
+        function showRealResult(data, resultElement, numberElement) {
+            numberElement.textContent = data.tracking_number;
+
+            resultElement.innerHTML = `
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <div class="text-xs text-white/60">NÚMERO DE GUÍA</div>
+                        <div class="font-mono font-semibold text-xl">${escapeHtml(data.tracking_number)}</div>
+                    </div>
+                    <div class="px-4 py-1 text-sm font-medium bg-emerald-500 text-emerald-900 rounded-3xl">${escapeHtml(data.status)}</div>
+                </div>
+
+                <div class="space-y-4 text-sm">
+                    <div class="flex justify-between items-center">
+                        <div>Origen</div>
+                        <div class="font-medium">${escapeHtml(data.origin)}</div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>Destino</div>
+                        <div class="font-medium">${escapeHtml(data.destination)}</div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>Entrega estimada</div>
+                        <div class="font-medium text-emerald-400">${escapeHtml(data.estimated_delivery || 'Próximamente')}</div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-6 border-t border-white/10 flex justify-center">
+                    <button onclick="resetTracking()" class="text-sm flex items-center gap-x-2 px-4 py-2 text-white/70 hover:text-white">
+                        <i class="fa-solid fa-redo"></i>
+                        <span>Realizar otra consulta</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        function showDemoResult(trackingNumber, resultElement, numberElement) {
+            numberElement.textContent = trackingNumber;
+            resultElement.innerHTML = `
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <div class="text-xs text-white/60">NÚMERO DE GUÍA</div>
+                        <div class="font-mono font-semibold text-xl">${escapeHtml(trackingNumber)}</div>
+                    </div>
+                    <div class="px-4 py-1 text-sm font-medium bg-emerald-500 text-emerald-900 rounded-3xl">En tránsito (Demo)</div>
+                </div>
+
+                <div class="space-y-4 text-sm">
+                    <div class="flex justify-between items-center">
+                        <div>Origen</div>
+                        <div class="font-medium">San José</div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>Destino</div>
+                        <div class="font-medium">Liberia, Guanacaste</div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>Estado actual</div>
+                        <div class="font-medium text-emerald-400">En ruta • Estimado: hoy</div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-6 border-t border-white/10 flex justify-center">
+                    <button onclick="resetTracking()" class="text-sm flex items-center gap-x-2 px-4 py-2 text-white/70 hover:text-white">
+                        <i class="fa-solid fa-redo"></i>
+                        <span>Realizar otra consulta</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        function resetTracking() {
+            const result = document.getElementById('tracking-result');
+            const input = document.getElementById('tracking-input');
+
+            result.style.display = 'none';
+            result.classList.add('hidden');
+            input.value = '';
+            input.focus();
+        }
+
+
+
+        // Contact form
+        function submitContactForm(e) {
+            e.preventDefault();
+            const form = e.target;
+
+            const originalText = form.querySelector('button').innerHTML;
+            form.querySelector('button').innerHTML = `
+                <span class="flex items-center justify-center gap-x-2">
+                    <i class="fa-solid fa-check"></i>
+                    <span>¡Mensaje enviado!</span>
+                </span>
+            `;
+            form.querySelector('button').disabled = true;
+
+            setTimeout(() => {
+                alert('¡Gracias! Hemos recibido tu mensaje. Te contactaremos pronto.');
+                form.reset();
+                form.querySelector('button').innerHTML = originalText;
+                form.querySelector('button').disabled = false;
+            }, 1600);
+        }
+
+        // Keyboard support for tracking
+        function initKeyboardSupport() {
+            document.getElementById('tracking-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    trackPackage();
+                }
+            });
+        }
+
+        // Initialize everything
+        function initializeWebsite() {
+            initializeTailwind();
+            initNavbar();
+            initKeyboardSupport();
+
+            // Demo tracking number hint
+            const input = document.getElementById('tracking-input');
+            input.placeholder = "Ejemplo: TMP-2025-78432";
+
+            // Easter egg: click logo to scroll top
+            document.querySelector('.fa-truck').parentElement.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Initialize Supabase
+            supabaseClient = initSupabase();
+
+            console.log('%c[Encomiendas Tempisque] Modern website initialized successfully.', 'color:#64748b');
+        }
+
+        // Boot
+        window.onload = initializeWebsite;
+    </script>
+</body>
+</html>
