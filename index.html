@@ -538,17 +538,29 @@
         }
 
         // ==================== SUPABASE CONFIG ====================
+        // Project: Encomiendas Tempisque DB (tcwtwgnpxqrhcqpuotgz)
         const SUPABASE_URL = 'https://tcwtwgnpxqrhcqpuotgz.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjd3R3Z25weHFyaGNxcHVvdGd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2MzExOTgsImV4cCI6MjA5OTIwNzE5OH0.9yuRtMbj8IW42_IrU843BCGWz8VOyS_8w4AA9hsVNng';
 
         let supabaseClient = null;
 
         function initSupabase() {
-            if (SUPABASE_URL.includes('tcwtwgnpxqrhcqpuotgz')) {
-                console.warn('%c[Supabase] Please replace SUPABASE_URL and SUPABASE_ANON_KEY with your real credentials.', 'color: #f59e0b');
+            if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+                console.error('%c[Supabase] La librería @supabase/supabase-js no se cargó. Revisa el <script> del CDN.', 'color: #ef4444');
                 return null;
             }
-            return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+                console.error('%c[Supabase] Faltan SUPABASE_URL o SUPABASE_ANON_KEY.', 'color: #ef4444');
+                return null;
+            }
+            try {
+                const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('%c[Supabase] Cliente conectado a ' + SUPABASE_URL, 'color: #10b981');
+                return client;
+            } catch (err) {
+                console.error('[Supabase] Error al crear el cliente:', err);
+                return null;
+            }
         }
 
         // ==================== REAL TRACKING FUNCTION ====================
@@ -583,19 +595,56 @@
                 }
 
                 if (!supabaseClient) {
-                    // Fallback to demo mode if credentials not set
-                    showDemoResult(trackingNumber, result, numberEl);
+                    result.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="fa-solid fa-plug-circle-xmark text-red-400 text-3xl mb-3"></i>
+                            <div class="font-semibold">No se pudo conectar a Supabase</div>
+                            <p class="text-sm text-white/60 mt-1">Revisa la consola del navegador (F12) para más detalles.</p>
+                            <button onclick="resetTracking()" class="mt-4 text-sm px-4 py-2 bg-white/10 rounded-2xl hover:bg-white/20">Intentar de nuevo</button>
+                        </div>
+                    `;
                     return;
                 }
 
-                // Query Supabase
+                // Query Supabase (tabla: packages, columna: tracking_number)
                 const { data, error } = await supabaseClient
                     .from('packages')
                     .select('*')
                     .eq('tracking_number', trackingNumber)
-                    .single();
+                    .maybeSingle();
 
-                if (error || !data) {
+                if (error) {
+                    console.error('[Supabase] Error de consulta:', error);
+                    // Código PGRST116 = 0 filas con .single(); con maybeSingle no debería pasar
+                    const isNotFound = error.code === 'PGRST116';
+                    const isPermission = error.code === '42501' || /permission|RLS|row-level/i.test(error.message || '');
+                    const isMissingTable = error.code === '42P01' || /relation|does not exist|schema cache/i.test(error.message || '');
+
+                    let title = 'Error al consultar';
+                    let detail = error.message || 'Error desconocido';
+                    if (isNotFound) {
+                        title = 'Paquete no encontrado';
+                        detail = 'Verifica el número de guía e intenta de nuevo.';
+                    } else if (isPermission) {
+                        title = 'Acceso denegado (RLS)';
+                        detail = 'La tabla packages necesita una política SELECT para el rol anon.';
+                    } else if (isMissingTable) {
+                        title = 'Tabla no encontrada';
+                        detail = 'No existe la tabla "packages" en el esquema public de Supabase.';
+                    }
+
+                    result.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="fa-solid fa-exclamation-triangle text-amber-400 text-3xl mb-3"></i>
+                            <div class="font-semibold">${escapeHtml(title)}</div>
+                            <p class="text-sm text-white/60 mt-1">${escapeHtml(detail)}</p>
+                            <button onclick="resetTracking()" class="mt-4 text-sm px-4 py-2 bg-white/10 rounded-2xl hover:bg-white/20">Intentar de nuevo</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (!data) {
                     result.innerHTML = `
                         <div class="text-center py-4">
                             <i class="fa-solid fa-exclamation-triangle text-amber-400 text-3xl mb-3"></i>
@@ -611,8 +660,15 @@
                 showRealResult(data, result, numberEl);
 
             } catch (err) {
-                console.error(err);
-                showDemoResult(trackingNumber, result, numberEl);
+                console.error('[Supabase] Excepción:', err);
+                result.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fa-solid fa-exclamation-triangle text-red-400 text-3xl mb-3"></i>
+                        <div class="font-semibold">Error inesperado</div>
+                        <p class="text-sm text-white/60 mt-1">${escapeHtml(err.message || String(err))}</p>
+                        <button onclick="resetTracking()" class="mt-4 text-sm px-4 py-2 bg-white/10 rounded-2xl hover:bg-white/20">Intentar de nuevo</button>
+                    </div>
+                `;
             }
         }
 
